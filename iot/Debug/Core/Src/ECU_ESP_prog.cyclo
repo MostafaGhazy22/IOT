@@ -1,3 +1,0 @@
-../Core/Src/ECU_ESP_prog.c:5:6:ESP_Send_AT_Command	1
-../Core/Src/ECU_ESP_prog.c:9:6:ESP_Init	1
-../Core/Src/ECU_ESP_prog.c:23:6:ESP_Get_LED_Status	1

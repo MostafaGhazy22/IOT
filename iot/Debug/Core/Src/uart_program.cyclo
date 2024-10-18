@@ -1,3 +1,0 @@
-../Core/Src/uart_program.c:21:6:UART_Init	1
-../Core/Src/uart_program.c:27:6:HAL_UART_RxCpltCallback	2
-../Core/Src/uart_program.c:38:10:UART_GetData	2
