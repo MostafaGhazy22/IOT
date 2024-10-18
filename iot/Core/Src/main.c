@@ -99,6 +99,7 @@ int main(void)
 	UART_Init();
 
 	printf("System starts ... \r\n");
+	printf("Test .. \r\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */
