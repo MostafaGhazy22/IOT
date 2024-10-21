@@ -16,7 +16,7 @@ void ESP_Init() {
     HAL_Delay(1000);
 
     // Connect to WiFi
-    ESP_Send_AT_Command("AT+CWJAP_CUR=\"Gold\",\"AmalGold97\"\r\n");
+    ESP_Send_AT_Command("AT+CWJAP_CUR=\"MOSTAFAGHAZY1\",\"MOSTAFA#MOSTAFA\"\r\n");
     HAL_Delay(1000);
 }
 
@@ -26,12 +26,10 @@ void ESP_Get_LED_Status() {
     HAL_Delay(1000);
 
     // Send GET request
-    ESP_Send_AT_Command("AT+CIPSEND=82\r\n");  // Adjust 66 to the length of your GET request
+    ESP_Send_AT_Command("AT+CIPSEND=98\r\n");  // Adjust 66 to the length of your GET request
     HAL_Delay(1000);
 
-    ESP_Send_AT_Command("GET /led-status.txt HTTP/1.1\r\nHost: iotprog.lovestoblog.com\r\nConnection: close\r\n\r\n");
-    printf("GET /led-status.txt HTTP/1.1\r\nHost: iotprog.lovestoblog.com\r\nConnection: close\r\n\r\n");
+    ESP_Send_AT_Command("GET /user_files/device_status_2.txt HTTP/1.1\r\nHost: iotprog.lovestoblog.com\r\nConnection: close\r\n\r\n");
     HAL_Delay(500);
-
     // Receive response and process in the main loop
 }
