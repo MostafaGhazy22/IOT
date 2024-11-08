@@ -11,5 +11,8 @@ void ESP_Init(void);
 
 // Function to send a GET request to fetch the LED status from the server
 void ESP_Get_LED_Status(void);
+void ESP_Get_FAN_Status(void);
+void ESP_Post_Gas_Value(uint8_t gasValue);
+
 
 #endif // ESP_PROG_H

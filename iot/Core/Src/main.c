@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -56,6 +57,8 @@ volatile uint32_t lastRequestTime = 0; // Timer for periodic requests
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+float Get_tempRead(void);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -94,10 +97,10 @@ int main(void)
 	MX_GPIO_Init();
 	MX_USART2_UART_Init();
 	MX_USART1_UART_Init();
+	MX_ADC1_Init();
 	/* USER CODE BEGIN 2 */
 	ESP_Init();
 	UART_Init();
-
 
 	/* USER CODE END 2 */
 
@@ -108,37 +111,37 @@ int main(void)
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
-		/* Check for periodic request */
+;		/* Check for periodic request */
 		if (HAL_GetTick() - lastRequestTime >= REQUEST_INTERVAL) {
 			lastRequestTime = HAL_GetTick(); // Update last request time
+			uint8_t read=Get_tempRead();
+			ESP_Post_Gas_Value(read);
 			ESP_Get_LED_Status(); // Request LED status from the server
 		}
 
 		// Check for new data
+		// Check for new data
 		uint16_t bytesReceived = UART_GetData(receivedData, RX_BUFFER_SIZE);
 		if (bytesReceived > 0) {
-			// Ensure the received data is null-terminated (optional)
+			// Ensure the received data is null-terminated
 			receivedData[bytesReceived] = '\0';
 
-			// Search for the relevant part of the HTTP response
-			char *content_start = strstr((char*)receivedData, "\r\n\r\n");  // Locate the start of the content (after HTTP headers)
-			if (content_start != NULL) {
-				content_start += 4;  // Move the pointer past "\r\n\r\n" to the actual content (should be '0' or '1')
+			// Search for "+IPD,1:" in the received data
+			char *ipd_position = strstr((char*)receivedData, "+IPD,1:");
+			if (ipd_position != NULL) {
+				// Move to the character right after "+IPD,1:" to get the content ('0' or '1')
+				char content = *(ipd_position + strlen("+IPD,1:"));
 
-				// Check if the first content byte is '1' or '0'
-				if (content_start[0] == '1') {
+				// Check if content is '1' or '0' to set the LED state
+				if (content == '1') {
 					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);  // Turn LED ON
-				} else if (content_start[0] == '0') {
+				} else if (content == '0') {
 					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);  // Turn LED OFF
 				}
-
 			}
-
-			// Optionally clear the buffer after processing
-			memset(receivedData, 0, RX_BUFFER_SIZE);
 		}
-	}
 
+	}
 	/* USER CODE END 3 */
 }
 
@@ -183,7 +186,22 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+float Get_tempRead(void) {
+	uint32_t adc_value = 0;
 
+	// Start the ADC in Continuous Conversion Mode
+	HAL_ADC_Start(&hadc1);
+
+	// Poll for ADC conversion completion continuously
+	if (HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY) == HAL_OK) {
+		// Read the ADC value
+		adc_value = HAL_ADC_GetValue(&hadc1);
+	}
+
+	// Convert ADC value to temperature in Celsius
+	float temperature = (adc_value * 3.3 / 4096) * 100;
+	return temperature;
+}
 
 /* USER CODE END 4 */
 
